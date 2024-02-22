@@ -95,7 +95,8 @@ namespace SGE.Controllers
                 }
             }
 
-            ViewData["TipoUsuarioId"] = new SelectList(_context.TiposUsuario, "TipoUsuarioId", "TipoUsuarioId");
+            Guid idTipo = _context.TiposUsuario.Where(a => a.Tipo == "Aluno").FirstOrDefault().TipoUsuarioId;
+            ViewData["TipoUsuarioId"] = idTipo;
             return View();
         }
 
@@ -137,6 +138,13 @@ namespace SGE.Controllers
                     }
                     aluno.UrlFoto = newFileName; // Atualiza o campo UrlFoto com o novo nome do arquivo
                 }
+
+                aluno.CadAtivo = true;
+                aluno.DataCadastro = DateTime.Now;
+                TipoUsuario tipoUsuario = _context.TiposUsuario.Where(a => a.Tipo == "Aluno").FirstOrDefault();
+                aluno.TipoUsuarioId = tipoUsuario.TipoUsuarioId;
+                aluno.TipoUsuario = tipoUsuario;
+
                 _context.Add(aluno);
                 await _context.SaveChangesAsync();
                 Usuario usuario = new Usuario();
@@ -145,8 +153,6 @@ namespace SGE.Controllers
                 usuario.Email = aluno.Email;
                 usuario.Senha = aluno.Senha;
                 usuario.Celular = aluno.Celular;
-                usuario.CadAtivo = true;
-                usuario.DataCadastro = DateTime.Now;
                 usuario.TipoUsuarioId = _context.TiposUsuario.Where(a => a.Tipo == "Aluno").FirstOrDefault().TipoUsuarioId;
                 usuario.TipoUsuario = _context.TiposUsuario.Where(a => a.Tipo == "Aluno").FirstOrDefault();
                 _context.Usuarios.Add(usuario);
